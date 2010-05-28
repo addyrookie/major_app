@@ -5,6 +5,6 @@ doc/api
 doc/app
 db/*.sqlite3
 *.swp
-* ̃
+*~
 .DS_Store
 
