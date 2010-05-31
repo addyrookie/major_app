@@ -46,15 +46,20 @@ class User < ActiveRecord::Base
  before_save :encrypt_password
 
   def has_password?(submitted_password)
-   encrypted_password == encrypt(submitted_password)
+    encrypted_password == encrypt(submitted_password)
   end
 
 
+  def remember_me!
+    self.remember_token = encrypt("#{salt}--#{id}")
+    save_without_validation
+  end
 
-  def authenticate(email , submitted_password)
+
+  def self.authenticate(email ,submitted_password)
     user = find_by_email(email)
     return nil if user.nil?
-    return user if user.has_password(submitted_password)
+    return user if user.has_password?(submitted_password)
   end
 
 
@@ -63,12 +68,14 @@ class User < ActiveRecord::Base
 
 private
   def encrypt_password
-    self.salt = make_salt
-    self.encrypted_password = encrypt(password)
+    unless password.nil?
+      self.salt = make_salt
+      self.encrypted_password = encrypt(password)
+    end
   end
 
   def encrypt(string)
-    secure_hash("#{salt}#{password}") 
+    secure_hash("#{salt}#{string}") 
   end
 
   def make_salt
