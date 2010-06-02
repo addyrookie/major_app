@@ -10,11 +10,6 @@ class UsersController < ApplicationController
     redirect_to users_path
   end
     
-
-  def authenticate 
-    deny_access unless signed_in? 
-  end
-
  
   def new
     @user  = User.new 
@@ -22,8 +17,9 @@ class UsersController < ApplicationController
   end
 
   def show 
-    @user  = User.find(params[:id])
-    @title = @user.name 
+    @user       = User.find(params[:id])
+    @microposts = @user.microposts.paginate(:page => params[:page]) 
+    @title      =CGI.escapeHTML(@user.name) 
   end
 
   def create 
@@ -71,8 +67,16 @@ class UsersController < ApplicationController
     redirect_to root_path unless current_user?(@user)
   end
 
+
+#found  mistake in the book . if the user is not signed in , it's current_user value will not be set
+# and admin? method is pointless in this case
+#  altered admin_user method is given below  
    def admin_user
-     redirect_to(root_path) unless current_user.admin?
+     if current_user.nil?
+        redirect_to(signin_path) 
+     else
+     redirect_to(root_path) unless (current_user.admin?)
+     end
    end
 end
 

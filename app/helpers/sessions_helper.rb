@@ -1,5 +1,11 @@
 module SessionsHelper
 
+  
+  def authenticate 
+    deny_access unless signed_in? 
+  end
+
+
   def sign_in(user)
     user.remember_me!
     cookies[:remember_token] = {:value   => user.remember_token ,
