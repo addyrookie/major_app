@@ -67,7 +67,7 @@ describe "POST 'create'" do
         response.should redirect_to(root_path)
       end
     end
-
+  end
 
 #    describe "for an authorized user" do
 #      before(:each) do
@@ -81,7 +81,9 @@ describe "POST 'create'" do
 #      end
 #    end
  end
-end
+
+
+
 
 
 

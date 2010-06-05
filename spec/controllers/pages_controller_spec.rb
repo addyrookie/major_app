@@ -16,7 +16,24 @@ describe PagesController do
       get 'home'
       response.should have_tag("title", "Ruby on Rails Tutorial Sample App | Home" )
     end
-  end
+    
+     describe "when signed in" do
+
+      before(:each) do
+        @user = test_sign_in(Factory(:user))
+        other_user = Factory(:user, :email => Factory.next(:email))
+        other_user.follow!(@user)
+      end
+
+      it "should have the right follower/following counts" do
+        get :home
+        response.should have_tag("a[href=?]", following_user_path(@user), 
+                                              /0 following/)
+        response.should have_tag("a[href=?]", followers_user_path(@user), 
+                                              /1 follower/)
+      end
+    end
+  end 
 
 
   describe "GET 'contact'" do

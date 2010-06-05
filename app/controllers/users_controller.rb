@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
 
-  before_filter :authenticate  , :only => [:edit , :update , :index]
+ # before_filter :authenticate  , :only => [:edit , :update , :index]
+  before_filter :authenticate , :except => [:create , :new , :show]
   before_filter :correct_user  , :only => [:edit , :update]
   before_filter :admin_user    , :only => :destroy
 
@@ -60,6 +61,24 @@ class UsersController < ApplicationController
 
 
 
+# user following and follower action  for displaying the same
+
+  def following
+    @title = "Following"
+    @user  =  User.find(params[:id])
+    @users =  @user.following.paginate(:page => params[:page])
+    render 'show_follow'
+  end
+
+
+  def followers 
+    @title = "Followers"
+    @user  = User.find(params[:id])
+    @users = @user.followers.paginate(:page => params[:page])
+    render 'show_follow'
+  end
+
+
  private
   
    def correct_user 
@@ -67,6 +86,10 @@ class UsersController < ApplicationController
     redirect_to root_path unless current_user?(@user)
   end
 
+  def admin_user
+    redirect_to root_path unless current_user.admin?
+  end
+ 
 
 #found  mistake in the book . if the user is not signed in , it's current_user value will not be set
 # and admin? method is pointless in this case
@@ -74,8 +97,8 @@ class UsersController < ApplicationController
    def admin_user
      if current_user.nil?
         redirect_to(signin_path) 
-     else
-     redirect_to(root_path) unless (current_user.admin?)
+     elsif !current_user.admin?
+        redirect_to(root_path)
      end
    end
 end
